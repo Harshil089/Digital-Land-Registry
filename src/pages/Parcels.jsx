@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useWeb3 } from '../contexts/Web3Context'
 import { MapPin, Search, Filter, Eye, Edit, Lock, Unlock, X, Calendar, User, Hash, Save } from 'lucide-react'
 
@@ -72,7 +72,24 @@ const Parcels = () => {
     }
   ]
 
-  const [parcels, setParcels] = useState(demoParcels)
+  // Initialize parcels from localStorage or demo data
+  const [parcels, setParcels] = useState(() => {
+    const savedParcels = localStorage.getItem('landchain_parcels')
+    if (savedParcels) {
+      try {
+        return JSON.parse(savedParcels)
+      } catch (error) {
+        console.error('Error parsing saved parcels:', error)
+        return demoParcels
+      }
+    }
+    return demoParcels
+  })
+
+  // Save parcels to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('landchain_parcels', JSON.stringify(parcels))
+  }, [parcels])
 
   const filteredParcels = parcels.filter(parcel => {
     const matchesSearch = parcel.id.toString().includes(searchTerm) ||
@@ -145,13 +162,18 @@ const Parcels = () => {
 
   const handleSaveEdit = () => {
     if (editingParcel) {
+      const updatedParcel = {
+        ...editingParcel,
+        lastUpdated: new Date().toISOString()
+      }
+      
       setParcels(prev => prev.map(parcel => 
-        parcel.id === editingParcel.id ? editingParcel : parcel
+        parcel.id === updatedParcel.id ? updatedParcel : parcel
       ))
       
       // Update the selected parcel if it's the same one
-      if (selectedParcel && selectedParcel.id === editingParcel.id) {
-        setSelectedParcel(editingParcel)
+      if (selectedParcel && selectedParcel.id === updatedParcel.id) {
+        setSelectedParcel(updatedParcel)
       }
       
       closeEditModal()
@@ -193,12 +215,28 @@ const Parcels = () => {
     }
   }
 
+  const resetToDemoData = () => {
+    if (window.confirm('This will reset all parcels to the original demo data. Are you sure?')) {
+      localStorage.removeItem('landchain_parcels')
+      setParcels(demoParcels)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Land Parcels</h1>
-        <p className="text-gray-600 mt-2">View and manage land parcel information</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Land Parcels</h1>
+          <p className="text-gray-600 mt-2">View and manage land parcel information</p>
+        </div>
+        <button
+          onClick={resetToDemoData}
+          className="btn-secondary flex items-center space-x-2"
+        >
+          <Hash className="h-4 w-4" />
+          <span>Reset to Demo</span>
+        </button>
       </div>
 
       {/* Filters */}

@@ -11,222 +11,185 @@ export const useMembers = () => {
 }
 
 export const MemberProvider = ({ children }) => {
-  const [members, setMembers] = useState([])
-  const [memberHistory, setMemberHistory] = useState([])
-  const [loading, setLoading] = useState(false)
-
-  // Demo data for better display purposes
-  const demoMembers = [
-    {
-      id: 1,
-      address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-      role: "officer",
-      name: "John Officer",
-      email: "john.officer@landchain.gov",
-      phone: "+1-555-0101",
-      joinDate: "2024-01-15",
-      status: "active",
-      lastActivity: "2024-01-20",
-      totalTransactions: 45,
-      avatar: "👨‍💼"
-    },
-    {
-      id: 2,
-      address: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-      role: "bank",
-      name: "Sarah Banker",
-      email: "sarah.banker@citybank.com",
-      phone: "+1-555-0102",
-      joinDate: "2024-01-10",
-      status: "active",
-      lastActivity: "2024-01-19",
-      totalTransactions: 23,
-      avatar: "🏦"
-    },
-    {
-      id: 3,
-      address: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      role: "user",
-      name: "Mike Landowner",
-      email: "mike@landowner.com",
-      phone: "+1-555-0103",
-      joinDate: "2024-01-05",
-      status: "active",
-      lastActivity: "2024-01-18",
-      totalTransactions: 12,
-      avatar: "👨‍🌾"
-    },
-    {
-      id: 4,
-      address: "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-      role: "user",
-      name: "Lisa Farmer",
-      email: "lisa@farmland.com",
-      phone: "+1-555-0104",
-      joinDate: "2024-01-12",
-      status: "active",
-      lastActivity: "2024-01-17",
-      totalTransactions: 8,
-      avatar: "👩‍🌾"
-    },
-    {
-      id: 5,
-      address: "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-      role: "user",
-      name: "David Developer",
-      email: "david@devland.com",
-      phone: "+1-555-0105",
-      joinDate: "2024-01-08",
-      status: "active",
-      lastActivity: "2024-01-16",
-      totalTransactions: 15,
-      avatar: "👨‍💻"
+  // Initialize with demo data or load from localStorage
+  const [members, setMembers] = useState(() => {
+    const savedMembers = localStorage.getItem('landchain_members')
+    if (savedMembers) {
+      try {
+        return JSON.parse(savedMembers)
+      } catch (error) {
+        console.error('Error parsing saved members:', error)
+        return getDemoMembers()
+      }
     }
-  ]
+    return getDemoMembers()
+  })
 
-  const demoHistory = [
-    {
-      id: 1,
-      memberId: 1,
-      action: "role_assigned",
-      details: "Assigned officer role",
-      timestamp: "2024-01-15T10:00:00Z",
-      status: "completed"
-    },
-    {
-      id: 2,
-      memberId: 2,
-      action: "role_assigned",
-      details: "Assigned bank role",
-      timestamp: "2024-01-10T14:30:00Z",
-      status: "completed"
-    },
-    {
-      id: 3,
-      memberId: 3,
-      action: "parcel_created",
-      details: "Created parcel #1 (1000 sqm, AGRI)",
-      timestamp: "2024-01-05T09:15:00Z",
-      status: "completed"
-    },
-    {
-      id: 4,
-      memberId: 4,
-      action: "parcel_created",
-      details: "Created parcel #2 (800 sqm, AGRI)",
-      timestamp: "2024-01-12T11:20:00Z",
-      status: "completed"
-    },
-    {
-      id: 5,
-      memberId: 5,
-      action: "parcel_created",
-      details: "Created parcel #3 (1200 sqm, RES)",
-      timestamp: "2024-01-08T16:45:00Z",
-      status: "completed"
-    },
-    {
-      id: 6,
-      memberId: 2,
-      action: "encumbrance_set",
-      details: "Set encumbrance on parcel #2",
-      timestamp: "2024-01-19T13:10:00Z",
-      status: "completed"
-    },
-    {
-      id: 7,
-      memberId: 1,
-      action: "ownership_transferred",
-      details: "Transferred parcel #1 to 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-      timestamp: "2024-01-20T15:30:00Z",
-      status: "completed"
-    },
-    {
-      id: 8,
-      memberId: 1,
-      action: "program_created",
-      details: "Created allocation program #101 for parcels [2,3]",
-      timestamp: "2024-01-20T16:00:00Z",
-      status: "completed"
-    }
-  ]
+  // Demo data for better display
+  function getDemoMembers() {
+    return [
+      {
+        id: 1,
+        name: "John Smith",
+        email: "john.smith@example.com",
+        phone: "+1-555-0123",
+        address: "123 Main St, New York, NY 10001",
+        role: "ADMIN",
+        status: "active",
+        registrationDate: "2024-01-01T00:00:00Z",
+        lastUpdated: "2024-01-01T00:00:00Z",
+        kycStatus: "verified",
+        documents: ["passport", "drivers_license"],
+        totalTransactions: 45,
+        lastActivity: "2024-01-20T15:30:00Z"
+      },
+      {
+        id: 2,
+        name: "Sarah Johnson",
+        email: "sarah.johnson@example.com",
+        phone: "+1-555-0124",
+        address: "456 Oak Ave, Los Angeles, CA 90210",
+        role: "OFFICER",
+        status: "active",
+        registrationDate: "2024-01-02T00:00:00Z",
+        lastUpdated: "2024-01-15T10:20:00Z",
+        kycStatus: "verified",
+        documents: ["passport", "utility_bill"],
+        totalTransactions: 32,
+        lastActivity: "2024-01-19T14:15:00Z"
+      },
+      {
+        id: 3,
+        name: "Michael Brown",
+        email: "michael.brown@example.com",
+        phone: "+1-555-0125",
+        address: "789 Pine Rd, Chicago, IL 60601",
+        role: "BANK",
+        status: "active",
+        registrationDate: "2024-01-03T00:00:00Z",
+        lastUpdated: "2024-01-10T09:45:00Z",
+        kycStatus: "verified",
+        documents: ["business_license", "bank_statement"],
+        totalTransactions: 28,
+        lastActivity: "2024-01-18T11:30:00Z"
+      },
+      {
+        id: 4,
+        name: "Emily Davis",
+        email: "emily.davis@example.com",
+        phone: "+1-555-0126",
+        address: "321 Elm St, Miami, FL 33101",
+        role: "USER",
+        status: "active",
+        registrationDate: "2024-01-04T00:00:00Z",
+        lastUpdated: "2024-01-12T16:20:00Z",
+        kycStatus: "pending",
+        documents: ["passport"],
+        totalTransactions: 15,
+        lastActivity: "2024-01-17T13:45:00Z"
+      },
+      {
+        id: 5,
+        name: "David Wilson",
+        email: "david.wilson@example.com",
+        phone: "+1-555-0127",
+        address: "654 Maple Dr, Seattle, WA 98101",
+        role: "USER",
+        status: "inactive",
+        registrationDate: "2024-01-05T00:00:00Z",
+        lastUpdated: "2024-01-08T12:10:00Z",
+        kycStatus: "rejected",
+        documents: ["passport", "utility_bill"],
+        totalTransactions: 8,
+        lastActivity: "2024-01-08T12:10:00Z"
+      },
+      {
+        id: 6,
+        name: "Lisa Anderson",
+        email: "lisa.anderson@example.com",
+        phone: "+1-555-0128",
+        address: "987 Cedar Ln, Denver, CO 80201",
+        role: "OFFICER",
+        status: "active",
+        registrationDate: "2024-01-06T00:00:00Z",
+        lastUpdated: "2024-01-14T08:30:00Z",
+        kycStatus: "verified",
+        documents: ["passport", "drivers_license", "background_check"],
+        totalTransactions: 41,
+        lastActivity: "2024-01-20T09:15:00Z"
+      },
+      {
+        id: 7,
+        name: "Robert Taylor",
+        email: "robert.taylor@example.com",
+        phone: "+1-555-0129",
+        address: "147 Birch Way, Austin, TX 73301",
+        role: "BANK",
+        status: "active",
+        registrationDate: "2024-01-07T00:00:00Z",
+        lastUpdated: "2024-01-11T14:20:00Z",
+        kycStatus: "verified",
+        documents: ["business_license", "bank_statement", "regulatory_approval"],
+        totalTransactions: 35,
+        lastActivity: "2024-01-19T16:45:00Z"
+      },
+      {
+        id: 8,
+        name: "Jennifer Martinez",
+        email: "jennifer.martinez@example.com",
+        phone: "+1-555-0130",
+        address: "258 Spruce St, Portland, OR 97201",
+        role: "USER",
+        status: "active",
+        registrationDate: "2024-01-08T00:00:00Z",
+        lastUpdated: "2024-01-13T11:55:00Z",
+        kycStatus: "pending",
+        documents: ["passport", "utility_bill"],
+        totalTransactions: 12,
+        lastActivity: "2024-01-16T10:30:00Z"
+      }
+    ]
+  }
 
+  // Save members to localStorage whenever they change
   useEffect(() => {
-    // Load demo data
-    setMembers(demoMembers)
-    setMemberHistory(demoHistory)
-  }, [])
+    localStorage.setItem('landchain_members', JSON.stringify(members))
+  }, [members])
 
-  const addMember = (memberData) => {
+  const addMember = (member) => {
     const newMember = {
-      id: members.length + 1,
-      ...memberData,
-      joinDate: new Date().toISOString().split('T')[0],
-      status: "active",
-      lastActivity: new Date().toISOString().split('T')[0],
-      totalTransactions: 0,
-      avatar: getAvatarForRole(memberData.role)
+      ...member,
+      id: member.id || Date.now(),
+      registrationDate: member.registrationDate || new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      status: member.status || 'active',
+      kycStatus: member.kycStatus || 'pending',
+      documents: member.documents || [],
+      totalTransactions: member.totalTransactions || 0,
+      lastActivity: new Date().toISOString()
     }
     
     setMembers(prev => [...prev, newMember])
-    
-    // Add to history
-    const historyEntry = {
-      id: memberHistory.length + 1,
-      memberId: newMember.id,
-      action: "member_registered",
-      details: `New member registered: ${memberData.name}`,
-      timestamp: new Date().toISOString(),
-      status: "completed"
-    }
-    
-    setMemberHistory(prev => [...prev, historyEntry])
   }
 
-  const updateMember = (id, updates) => {
+  const updateMember = (id, updatedData) => {
     setMembers(prev => prev.map(member => 
-      member.id === id ? { ...member, ...updates } : member
+      member.id === id 
+        ? { ...member, ...updatedData, lastUpdated: new Date().toISOString() }
+        : member
     ))
-    
-    // Add to history
-    const historyEntry = {
-      id: memberHistory.length + 1,
-      memberId: id,
-      action: "member_updated",
-      details: `Member updated: ${Object.keys(updates).join(', ')}`,
-      timestamp: new Date().toISOString(),
-      status: "completed"
-    }
-    
-    setMemberHistory(prev => [...prev, historyEntry])
   }
 
   const deactivateMember = (id) => {
     setMembers(prev => prev.map(member => 
-      member.id === id ? { ...member, status: "inactive" } : member
+      member.id === id 
+        ? { ...member, status: 'inactive', lastUpdated: new Date().toISOString() }
+        : member
     ))
-    
-    // Add to history
-    const historyEntry = {
-      id: memberHistory.length + 1,
-      memberId: id,
-      action: "member_deactivated",
-      details: "Member deactivated",
-      timestamp: new Date().toISOString(),
-      status: "completed"
-    }
-    
-    setMemberHistory(prev => [...prev, historyEntry])
   }
 
-  const getAvatarForRole = (role) => {
-    const avatars = {
-      admin: "👑",
-      officer: "👨‍💼",
-      bank: "🏦",
-      user: "👤"
-    }
-    return avatars[role] || "👤"
+  const deleteMember = (id) => {
+    setMembers(prev => prev.filter(member => member.id !== id))
   }
 
   const getMemberById = (id) => {
@@ -238,24 +201,29 @@ export const MemberProvider = ({ children }) => {
   }
 
   const getActiveMembers = () => {
-    return members.filter(member => member.status === "active")
+    return members.filter(member => member.status === 'active')
   }
 
-  const getMemberHistory = (memberId) => {
-    return memberHistory.filter(entry => entry.memberId === memberId)
+  const getMembersByKycStatus = (kycStatus) => {
+    return members.filter(member => member.kycStatus === kycStatus)
+  }
+
+  const resetToDemoData = () => {
+    localStorage.removeItem('landchain_members')
+    setMembers(getDemoMembers())
   }
 
   const value = {
     members,
-    memberHistory,
-    loading,
     addMember,
     updateMember,
     deactivateMember,
+    deleteMember,
     getMemberById,
     getMembersByRole,
     getActiveMembers,
-    getMemberHistory
+    getMembersByKycStatus,
+    resetToDemoData
   }
 
   return (
